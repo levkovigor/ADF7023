@@ -1,0 +1,28 @@
+#######################################
+# Syntax Coloring Map For ADF7023
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+adf7023	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+init		KEYWORD2
+get_status	KEYWORD2
+set_command	KEYWORD2
+set_fw_state	KEYWORD2
+receive_packet	KEYWORD2
+transmit_packet	KEYWORD2
+set_channel_frequency	KEYWORD2
+set_data_rate	KEYWORD2
+set_frequency_deviation	KEYWORD2
+available	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################

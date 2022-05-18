@@ -27,6 +27,7 @@
 #define FW_STATE_AES_DECRYPT_INIT 0x08
 #define FW_STATE_AES_DECRYPT      0x09
 #define FW_STATE_AES_ENCRYPT      0x0A
+#define FW_STATE_HW_RESET	      0x0B
 
 /* SPI Memory Access Commands */
 #define SPI_MEM_WR  0x18 // Write data to packet RAM sequentially.
@@ -338,7 +339,7 @@ struct adf7023_bbram {
 class adf7023
 {
   public:
-    adf7023(int slaveSelectPin, int misoPin, int spiClockDivider, SPIClass *spiinterface=&SPI);
+    adf7023(int slaveSelectPin, int misoPin, int spiClockDivider=SPI_CLOCK_DIV32, SPIClass *spiinterface=&SPI);
 	
 	/* Transfers one byte of data. */
 	void write_read_byte(uint8_t write_byte,

@@ -29,12 +29,11 @@ void setup() {
    
   if (ADF7023.init() != -1) 
 	{
-	  ADF7023.set_command(CMD_HW_RESET);
+	  ADF7023.set_fw_state(FW_STATE_HW_RESET);
+	  ADF7023.set_fw_state(FW_STATE_PHY_ON);
 	  ADF7023.set_data_rate(38400);
 	  ADF7023.set_frequency_deviation(10000);
 	  ADF7023.set_channel_frequency(868225000);
-	  ADF7023.set_fw_state(FW_STATE_PHY_ON);
-	  ADF7023.set_fw_state(FW_STATE_PHY_TX);
 	} else {
 		Serial.println("Init failed");
 		while(1);

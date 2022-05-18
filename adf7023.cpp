@@ -74,20 +74,22 @@ int32_t adf7023::init()
 	digitalWrite(_slaveSelectPin, HIGH);
 	delay(1000);
 	digitalWrite(_slaveSelectPin, LOW);
+	unsigned long timeOut = millis();
 	while ((miso == 0) && (timeout < 1000)) {
 		miso = digitalRead(_misoPin);
-		timeout++;
-	}
-	if (timeout == 1000) {
-		ret = -1;
-		return ret;
+		if ((timeOut + 5000) < millis()) return -1;
 	}
 	
-	unsigned long timeOut = millis();
+	/*if (timeout == 1000) {
+		ret = -1;
+		//return ret;
+	}*/
+	
+	timeOut = millis();
 	
 	while(!(status & STATUS_CMD_READY)) {
 		get_status(&status);
-		if ((timeOut + 5000) > millis()) return -1;
+		if ((timeOut + 5000) < millis()) return -1;
 	}
 	set_ram(0x100, 64, (uint8_t*)&adf7023_bbram_current);
 	set_command(CMD_CONFIG_DEV);
@@ -163,6 +165,10 @@ void adf7023::set_fw_state(uint8_t fw_state)
 		break;
 	case FW_STATE_PHY_TX:
 		set_command(CMD_PHY_TX);
+		break;
+	case FW_STATE_HW_RESET:
+		set_command(CMD_HW_RESET);
+		fw_state = FW_STATE_PHY_OFF;
 		break;
 	default:
 		set_command(CMD_PHY_SLEEP);

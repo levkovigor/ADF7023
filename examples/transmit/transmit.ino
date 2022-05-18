@@ -13,6 +13,9 @@ adf7023 ADF7023(5, 19/*, SPI_CLOCK_DIV32, &_mySPI*/);
  * 
  * For ESP32 tested with:
  * adf7023 ADF7023(5, 19, SPI_CLOCK_DIV32);
+ * 
+ * For Arduino UNO tested with:
+ * adf7023 ADF7023(10, 12, SPI_CLOCK_DIV2);
  */
  
 void setup() { 

@@ -3,7 +3,7 @@
 /*
  * if not default SPI Interface - useful for STM32Duino
  *
- * SPIClass _mySPI
+ * SPIClass _mySPI;
  */
 
 adf7023 ADF7023(5, 19/*, SPI_CLOCK_DIV32, &_mySPI*/);

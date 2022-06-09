@@ -12,7 +12,8 @@
 struct adf7023_bbram adf7023_bbram_default = {
   /* interrupt_mask0 - 0x100 */
   BBRAM_INTERRUPT_MASK_0_INTERRUPT_TX_EOF |
-  BBRAM_INTERRUPT_MASK_0_INTERRUPT_CRC_CORRECT,
+  BBRAM_INTERRUPT_MASK_0_INTERRUPT_CRC_CORRECT | 
+  BBRAM_INTERRUPT_MASK_0_INTERRUPT_PREMABLE_DETECT,
   /* interrupt_mask1 - 0x101 */
   0x00,
   /* number_of_wakeups0 - 0x102 */
@@ -75,7 +76,7 @@ struct adf7023_bbram adf7023_bbram_default = {
   /* symbol_mode - 0x11C */
   BBRAM_SYMBOL_MODE_MANCHESTER_ENC,
   /* preamble_len - 0x11D */
-  0x20,
+  0xFF,
   /* crc_poly0 - 0x11E */
   0x00,
   /* crc_poly1 - 0x11F */

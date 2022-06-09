@@ -387,8 +387,17 @@ class adf7023
 	/* Sets the frequency deviation. */
 	void set_frequency_deviation(uint32_t freq_dev);
 	
-	/* Length of received packet */
+	/* More than 0 when Packet Received and CRC is correct */
 	int32_t available();
+	
+	/* More than 0 when Preamble Detected */
+	int32_t preambleDetected();
+	
+	/* RSSI Measurement with CMD_GET_RSSI */
+	int readRSSI_PHY_ON();
+	
+	/* RSSI Measurement at PHY_RX state */
+	float readRSSI_PHY_RX();
 	
   private:
 	int _slaveSelectPin;

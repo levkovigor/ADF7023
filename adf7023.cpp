@@ -170,6 +170,10 @@ void adf7023::set_fw_state(uint8_t fw_state)
 		set_command(CMD_HW_RESET);
 		fw_state = FW_STATE_PHY_OFF;
 		break;
+	case FW_STATE_GET_RSSI:
+		set_command(CMD_GET_RSSI);
+		fw_state = FW_STATE_PHY_ON;
+		break;
 	default:
 		set_command(CMD_PHY_SLEEP);
 	}
@@ -335,11 +339,11 @@ void adf7023::set_frequency_deviation(uint32_t freq_dev)
 }
 
 /***************************************************************************//**
- * @brief Length of received packet.
+ * @brief More than 0 when Packet Received and CRC is correct.
  *
- * @return ret - Length of received packet.
+ * @return ret - More than 0 when Packet Received and CRC is correct.
  *               Example: 0 - if there is no packet;
- *                        > 0 - if packet received.
+ *                        > 0 - if packet received and CRC is correct.
 *******************************************************************************/
 
 int32_t adf7023::available()
@@ -357,4 +361,89 @@ int32_t adf7023::available()
 	get_ram(MCR_REG_INTERRUPT_SOURCE_0, 0x1, &interrupt_reg);
 	
 	return ((interrupt_reg & BBRAM_INTERRUPT_MASK_0_INTERRUPT_CRC_CORRECT) > 0);
+}
+
+/***************************************************************************//**
+ * @brief More than 0 when Preamble Detected.
+ *
+ * @return ret - More than 0 when Preamble Detected.
+ *               Example: 0 - if preamble is not detected;
+ *                        > 0 - if preamble is detected.
+*******************************************************************************/
+
+int32_t adf7023::preambleDetected()
+{
+	uint8_t interrupt_reg = 0;
+	uint8_t status = 0;
+
+	get_status(&status);
+	if ((status & STATUS_FW_STATE) != FW_STATE_PHY_RX)
+	{
+		set_fw_state(FW_STATE_PHY_ON);
+		set_fw_state(FW_STATE_PHY_RX);
+	}
+	
+	get_ram(MCR_REG_INTERRUPT_SOURCE_0, 0x1, &interrupt_reg);
+	
+	return ((interrupt_reg & BBRAM_INTERRUPT_MASK_0_INTERRUPT_PREMABLE_DETECT) > 0);
+}
+
+/***************************************************************************//**
+ * @brief RSSI Measurement with CMD_GET_RSSI.
+ *
+ * @return ret - RSSI in dbm (int).
+*******************************************************************************/
+
+int adf7023::readRSSI_PHY_ON()
+{
+	uint8_t rssi_readback = 0;
+	get_ram(MCR_REG_RSSI_READBACK, 0x1, &rssi_readback);
+	return (int)rssi_readback - 107;
+}
+
+/***************************************************************************//**
+ * @brief RSSI Measurement at PHY_RX state.
+ *
+ * @return ret - RSSI in dbm (float).
+*******************************************************************************/
+
+float adf7023::readRSSI_PHY_RX()
+{
+	
+	uint8_t adc_readback_high = 0;
+	uint8_t adc_readback_low = 0;
+	uint8_t adc_gain_status = 0;
+	get_ram(MCR_REG_AGC_GAIN_STATUS , 0x1, &adc_gain_status);
+	
+	int gain_correction = 0;
+	switch(adc_gain_status) {
+	case 0x00:
+		gain_correction = 44;
+		break;
+	case 0x01:
+		gain_correction = 35;
+		break;
+	case 0x02:
+		gain_correction = 26;
+		break;
+	case 0x0A:
+		gain_correction = 17;
+		break;
+	case 0x12:
+		gain_correction = 10;
+		break;
+	case 0x16:
+		gain_correction = 0;
+		break;
+	default:
+		gain_correction = 0;
+	}
+	
+	get_ram(MCR_REG_ADC_READBACK_HIGH , 0x1, &adc_readback_high);
+	get_ram(MCR_REG_ADC_READBACK_LOW , 0x1, &adc_readback_low);
+	get_ram(MCR_REG_ADC_READBACK_HIGH , 0x1, &adc_readback_high);
+	adc_readback_high = adc_readback_high & 0b11111100;
+	adc_readback_low = adc_readback_low & 0b000000011;
+	adc_readback_high = adc_readback_high | adc_readback_low;
+	return (float)adc_readback_high / 7.0 + (float)gain_correction - 109.0;
 }
